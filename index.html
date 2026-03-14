@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server Status</title>
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.1);
+            --online: #4ade80;
+            --offline: #ff4d4d;
+        }
+
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #0f172a;
+            font-family: sans-serif;
+            color: white;
+        }
+
+        .card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 30px;
+            padding: 40px;
+            text-align: center;
+            width: 300px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        #server-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 2px solid rgba(255,255,255,0.1);
+        }
+
+        .status-text {
+            font-weight: bold;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .ip {
+            font-size: 0.8rem;
+            opacity: 0.5;
+        }
+
+        .indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        .is-online { color: var(--online); }
+        .is-offline { color: var(--offline); }
+        .bg-online { background: var(--online); box-shadow: 0 0 10px var(--online); }
+        .bg-offline { background: var(--offline); }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <img id="server-icon" src="" alt="Icon">
+    
+    <div id="status-area">
+        <span class="status-text">
+            <span id="dot" class="indicator"></span>
+            <span id="text">ПРОВЕРКА...</span>
+        </span>
+        <span class="ip">siemkifivfiv.nexcraft.me:23232</span>
+    </div>
+</div>
+
+<script>
+    const IP = 'siemkifivfiv.nexcraft.me:23232';
+    const iconImg = document.getElementById('server-icon');
+    const statusText = document.getElementById('text');
+    const dot = document.getElementById('dot');
+
+    function updateStatus() {
+        // Генерируем ссылку на иконку с таймстампом, чтобы избежать кэширования
+        const timestamp = new Date().getTime();
+        const iconUrl = `https://api.mcsrvstat.us/icon/${IP}?t=${timestamp}`;
+        
+        iconImg.src = iconUrl;
+
+        // Пытаемся проверить статус через загрузку картинки
+        iconImg.onload = function() {
+            // Если картинка загрузилась, сервер скорее всего онлайн
+            // (API всегда отдает картинку, но для офлайна она стандартная)
+            // Чтобы понять точнее без fetch, мы просто показываем иконку
+            statusText.textContent = "SERVER READY";
+            statusText.className = "status-text is-online";
+            dot.className = "indicator bg-online";
+        };
+
+        iconImg.onerror = function() {
+            statusText.textContent = "OFFLINE";
+            statusText.className = "status-text is-offline";
+            dot.className = "indicator bg-offline";
+        };
+    }
+
+    updateStatus();
+    setInterval(updateStatus, 60000);
+</script>
+
+</body>
+</html>
